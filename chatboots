@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chatbot</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    
+
+
+    <div class="container">
+
+        <h1 class="text-center">Awesome Chatbot App</h1>
+
+        <div class="media" style="background-color:whitesmoke">
+            <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle float-left img-thumbnail" width="75px" alt="...">
+            <div class="media-body">
+              <h5 style="margin:10px">Chatbot</h5>
+                <span style="margin-left: 10px; color:rgb(32, 199, 32)">Online</span>
+            </div>
+          </div>
+
+
+          <!--Messages container-->
+          <div id="chatContainer" class="container border overflow-auto" style="height:500px">
+
+            <!-- Chatbot message design
+            <div class="w-50 float-left shadow-sm" style="margin: 10px; padding: 5px;">
+                <span>Chat: </span>
+                <span style="margin-top:10px; padding:10px"> How are you?</span>
+            </div>
+
+           
+            
+            user message design
+            <div class="w-50 float-right shadow-sm" style="margin: 10px; padding: 5px;">
+                <span>You: </span>
+                <span style="margin-top:10px; padding:10px"> Great</span>
+            </div> -->
+
+
+
+          </div>
+
+          <div class="input-group">
+              <input id="textbox" type="text" class="form-control" />
+
+              <div class="input-group-append">
+
+                        <button id="sendBtn" type="btton" class="btn btn-primary">Send</button>
+              </div>
+
+
+
+          </div>
+
+          
+
+
+
+
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script src="js/main.js"></script>
+</body>
+</html>
+
+
+
+
+// Personal Assistant
+
+
+
+
+//elements
+var sendBtn = document.getElementById('sendBtn');
+var textbox = document.getElementById('textbox');
+var chatContainer = document.getElementById('chatContainer');
+
+
+var user = {message:""};
+
+var httpRequest;
+
+chatbotSendMessage("Please choose an option: ");
+initializeOptions();
+
+
+
+function chatbotSendMessage(messageText){
+
+
+    var messageElement = document.createElement('div');
+    messageElement.classList.add('w-50');
+    messageElement.classList.add('float-left');
+    messageElement.classList.add('shadow-sm');
+    messageElement.style.margin ="10px";
+    messageElement.style.padding ="5px";
+
+    messageElement.innerHTML = "<span>Chatbot: </span>"+
+    "<span style="+"margin-top:10px; padding:10px"+">"+ messageText +"</span>";
+
+    messageElement.animate([{easing:"ease-in",opacity:0.4},{opacity:1}],{duration:1000}); 
+    chatContainer.appendChild(messageElement);
+
+     //scroll to last message
+     chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+}
+
+
+
+function sendMessage(messageText){
+
+     var messageElement = document.createElement('div');
+     messageElement.classList.add('w-50');
+     messageElement.classList.add('float-right');
+     messageElement.classList.add('shadow-sm');
+     messageElement.style.margin ="10px";
+     messageElement.style.padding ="5px";
+
+     messageElement.innerHTML = "<span>You: </span>"+
+     "<span style="+"margin-top:10px; padding:10px"+">"+ messageText +"</span>";
+
+     messageElement.animate([{easing:"ease-in",opacity:0.4},{opacity:1}],{duration:1000}); 
+   
+     chatContainer.appendChild(messageElement);
+
+     //scroll to last message
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+   
+
+}
+
+
+
+
+
+
+
+function initializeOptions(){
+
+     let options = [
+       {number:1,chocie:"Weather"},
+       {number:2,chocie:"Sports"},
+       {number:3,chocie:"News"},
+     ];
+
+
+    var messageElement = document.createElement('div');
+    messageElement.classList.add('w-50');
+    messageElement.classList.add('float-left');
+    messageElement.classList.add('shadow-sm');
+    messageElement.style.margin ="10px";
+    messageElement.style.padding ="5px";
+
+    for(let i=0; i<options.length; i++){
+          messageElement.innerHTML +=  "<br>"+
+          "<span style="+"margin-top:10px; padding:10px"+">"+ options[i].number +" - "+ options[i].chocie +"</span>";
+
+    }
+
+    messageElement.animate([{easing:"ease-in",opacity:0.4},{opacity:1}],{duration:1000}); 
+    chatContainer.appendChild(messageElement);
+      
+
+
+}
+
+
+
+
+function handleWeatherResponse(){
+
+      if(httpRequest.readyState === XMLHttpRequest.DONE){
+               if(httpRequest.status === 200){
+                // console.log(httpRequest.responseText);    
+                let response = JSON.parse(httpRequest.responseText);
+
+                let city = response.location.name;
+                let temp = response.current.temperature;
+                let hum = response.current.humidity;
+                let icon = response.current.weather_icons[0];
+
+                let messageToSend = "<br>";
+                messageToSend += "<span> <img src='"+ icon +"' > </span>";
+                messageToSend += "<br>";
+                messageToSend += " City: "+ city;
+                messageToSend += "<br>";
+                messageToSend += " Temperature: "+ temp + " C";
+                messageToSend += "<br>";
+                messageToSend += " Humidity: "+ hum;
+
+                chatbotSendMessage(messageToSend);
+
+
+
+               chatbotSendMessage("Please choose an option: ");
+                initializeOptions();
+
+
+               }else{
+
+                    alert("There was an unexpected error.");
+               }
+
+      }
+
+}
+
+
+
+
+
+function getWeatherRequest(lat,long){
+
+     httpRequest = new XMLHttpRequest();
+
+     httpRequest.onreadystatechange = handleWeatherResponse
+     httpRequest.open('GET',"http://api.weatherstack.com/current?access_key=0d3ad50bafa8fc0d247be50f2f691507&query="+lat+','+long);
+     httpRequest.send();
+
+}
+
+
+function getLocationAndWeather(){
+
+
+       navigator.geolocation.getCurrentPosition((pos)=>{
+
+         let lat = pos.coords.latitude;
+         let long = pos.coords.longitude;
+
+         getWeatherRequest(lat,long);
+
+
+       },(err)=>{
+
+          console.log(err);
+
+       });
+
+
+
+}
+
+
+function assistantResponse(messageText){
+
+
+         let userChoice =  parseInt(messageText.trim());
+
+         chatbotSendMessage('Please wait...');
+
+         switch(userChoice){
+
+          case 1:
+               //alert("you chose weather");
+               //get location then weather
+               getLocationAndWeather();
+               break;
+          case 2:
+               //get sports news
+               alert("you chose sports");
+               window.open('https://www.google.com/search?q=sports');
+               break;
+          case 3:
+               //get general news
+               alert("you chose news");
+               window.open('https://www.google.com/search?q=news');
+               break;
+           default:               
+           alert("Please choose a valid number");
+           chatbotSendMessage("Please choose a valid number");
+         }
+
+
+}
+
+sendBtn.addEventListener('click', function(e){
+
+    if(textbox.value == ""){
+     alert('Please type in a message');
+
+    }else{
+         
+     let messageText = textbox.value.trim();   
+     user.message = messageText;
+     sendMessage(messageText); 
+     textbox.value = "";  
+     
+  
+      assistantResponse(messageText);
+
+
+
+    }
+});
+
+
+
+textbox.addEventListener('keypress',function(e){
+
+     //if user hits the enter button on keyborad (13)
+      if(e.which == 13){
+          if(textbox.value == ""){
+               alert('Please type in a message');
+          
+              }else{
+                   
+               let messageText = textbox.value.trim();
+               user.message = messageText;
+               sendMessage(messageText); 
+               textbox.value = "";  
+        
+          
+               assistantResponse(messageText);
+          
+             
+              }
+
+
+      }
+
+
+});
+
+
+
+
+ 
+
